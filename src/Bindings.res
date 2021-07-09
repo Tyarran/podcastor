@@ -52,14 +52,15 @@ module JsYaml = {
     date: string,
     @as("Slug") slug: option<string>,
   }
-  external toMetadata: Js.Dict.t<Validators.raw> => metadata = "%identity"
+  external toMetadata: Js.Dict.t<Colander.raw> => metadata = "%identity"
 
-  @module("js-yaml") external loadMetadata: string => Js.Dict.t<Validators.raw> = "load"
+  @module("js-yaml") external loadMetadata: string => Js.Dict.t<Colander.raw> = "load"
 }
 
 module Chalk = {
   @module("chalk") external red: string => string = "red"
   @module("chalk") external white: string => string = "white"
   @module("chalk") external yellow: string => string = "yellow"
+  @module("chalk") external green: string => string = "green"
   @get external bold: string => string = "bold"
 }

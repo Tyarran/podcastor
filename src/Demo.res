@@ -111,7 +111,7 @@ let result = getEpisodePaths(podcast)->Js.Promise.then_(filepaths => {
     let _ = Bindings.Node.Fs.Promise.readFile(filepath, "utf-8")->Js.Promise.then_(content => {
       let result = Reader.read(content, filepath)
       let formated = switch result {
-      | Ok(_) => "ok"
+      | Ok(_) => <Colorize color=Colorize.Green> "ok" </Colorize>
       | Error(error) => Reader.formatError(error)
       }
       Js.log(formated)->Js.Promise.resolve

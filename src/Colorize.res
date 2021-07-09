@@ -1,4 +1,4 @@
-type colors = Red | White | Yellow
+type colors = Red | White | Yellow | Green
 type modifiers = Bold
 
 let createElement = (~color, ~children=list{}, ()) => {
@@ -7,6 +7,7 @@ let createElement = (~color, ~children=list{}, ()) => {
     | Red => Bindings.Chalk.red(child)
     | White => Bindings.Chalk.white(child)
     | Yellow => Bindings.Chalk.yellow(child)
+    | Green => Bindings.Chalk.green(child)
     }
   })
   let result = Belt.List.reduce(colored->Belt.List.reverse, "", (item, acc) => {

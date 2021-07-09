@@ -3,7 +3,7 @@ type groups = {
   content: string,
 }
 
-type validationErrors = array<(Js.Dict.key, Validators.reason)>
+type validationErrors = array<(Js.Dict.key, Colander.reason)>
 
 type metadataReadError = MetadataValidationError(validationErrors) | UnreadableMetadataError
 type contentReadError = UnreadableContentError
@@ -19,13 +19,14 @@ type readerError =
 
 let loadMetadata = yamlContent => {
   try {
-    open Validators
+    open Colander
     let readed = Bindings.JsYaml.loadMetadata(yamlContent)
+    Js.log(readed)
     let validated = valid(
       readed,
       <Obj>
         <Field name="Title" required=true validator=string />
-        <Field name="date" required=true validator=string />
+        <Field name="Date" required=true validator=date />
         <Field name="Slug" required=false validator=string />
       </Obj>,
     )
@@ -82,7 +83,7 @@ let makeEpisode = (metadata: Types.Episode.metadata, content, path) => {
 }
 
 let formatError = error => {
-  open Validators
+  open Colander
 
   let format = (path, message) =>
     <Colorize color=Colorize.White>
