@@ -118,3 +118,7 @@ let result = getEpisodePaths(podcast)->Js.Promise.then_(filepaths => {
     }, _)
   })->Js.Promise.resolve
 }, _)
+
+/* open Test */
+
+/* \">>="(1, 2) */

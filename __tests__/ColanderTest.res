@@ -2,83 +2,115 @@ open Jest
 open Expect
 
 describe("Test string validation", () => {
-  test("javascript string", () => {
+  test("js string", () => {
     let value = %raw(`"a string"`)
     expect(Colander.string(value)) |> toBe(true)
   })
 
-  test("javascript null", () => {
+  test("Js null", () => {
     let value = %raw(`null`)
     expect(Colander.string(value)) |> toBe(false)
   })
 
-  test("javascript undefined", () => {
+  test("Js undefined", () => {
     let value = %raw(`undefined`)
     expect(Colander.string(value)) |> toBe(false)
   })
 
-  test("javascript int", () => {
+  test("Js int", () => {
     let value = %raw(`42`)
     expect(Colander.string(value)) |> toBe(false)
   })
 
-  test("javascript object", () => {
+  test("Js object", () => {
     let value = %raw(`{"one": 1}`)
     expect(Colander.string(value)) |> toBe(false)
   })
 })
 
 describe("Test int validation", () => {
-  test("javascript int", () => {
+  test("Js int", () => {
     let value = %raw(`42`)
     expect(Colander.int(value)) |> toBe(true)
   })
 
-  test("javascript string", () => {
+  test("Js string", () => {
     let value = %raw(`"42"`)
     expect(Colander.int(value)) |> toBe(false)
   })
 
-  test("javascript null", () => {
+  test("Js null", () => {
     let value = %raw(`null`)
     expect(Colander.string(value)) |> toBe(false)
   })
 
-  test("javascript undefined", () => {
+  test("Js undefined", () => {
     let value = %raw(`undefined`)
     expect(Colander.string(value)) |> toBe(false)
   })
 
-  test("javascript object", () => {
+  test("Js object", () => {
     let value = %raw(`{"one": 1}`)
     expect(Colander.string(value)) |> toBe(false)
   })
 })
 
 describe("Test null or undefined validation", () => {
-  test("javascript int", () => {
+  test("Js int", () => {
     let value = %raw(`42`)
     expect(Colander.nullOrUndefined(value)) |> toBe(false)
   })
 
-  test("javascript string", () => {
+  test("Js string", () => {
     let value = %raw(`"42"`)
     expect(Colander.nullOrUndefined(value)) |> toBe(false)
   })
 
-  test("javascript null", () => {
+  test("Js null", () => {
     let value = %raw(`null`)
     expect(Colander.nullOrUndefined(value)) |> toBe(true)
   })
 
-  test("javascript undefined", () => {
+  test("Js undefined", () => {
     let value = %raw(`undefined`)
     expect(Colander.nullOrUndefined(value)) |> toBe(true)
   })
 
-  test("a javascript object", () => {
+  test("a Js object", () => {
     let value = %raw(`{"one": 1}`)
     expect(Colander.nullOrUndefined(value)) |> toBe(false)
+  })
+})
+
+describe("Test Date validation", () => {
+  test("Js int", () => {
+    let value = %raw(`new Date()`)
+    expect(Colander.date(value)) |> toBe(true)
+  })
+
+  test("Js int", () => {
+    let value = %raw(`42`)
+    expect(Colander.date(value)) |> toBe(false)
+  })
+
+  test("Js string", () => {
+    let value = %raw(`"42"`)
+    expect(Colander.date(value)) |> toBe(false)
+  })
+
+  test("Js null", () => {
+    let value = %raw(`null`)
+    expect(Colander.date(value)) |> toBe(false)
+  })
+
+  test("Js undefined", () => {
+    let value = %raw(`undefined`)
+    expect(Colander.date(value)) |> toBe(false)
+  })
+
+  test("a Js object", () => {
+    let value = %raw(`{"one": 1}`)
+    expect(Colander.date(value)) |> toBe(false)
   })
 })
 
@@ -141,5 +173,62 @@ describe("Test Field module", () => {
     let result = Field.createElement(~required, ~name, ~validator, ())(data)
 
     expect(result) |> toEqual((name, Ok(value)))
+  })
+})
+
+describe("Test instanceOfDate", () => {
+  test("Try to identify a valid Date", () => {
+    let value = %raw(`new Date("2021-07-17 13:22:00")`)
+
+    expect(Colander.instanceOfDate(value)) |> toBe(true)
+  })
+
+  test("Try to identify an invalid Date", () => {
+    let value = %raw(`"2021-07-17 13:22:00"`)
+
+    expect(Colander.instanceOfDate(value)) |> toBe(false)
+  })
+  test("Try to identify a null Date", () => {
+    let value = %raw(`null`)
+
+    expect(Colander.instanceOfDate(value)) |> toBe(false)
+  })
+
+  test("Try to identify a undefined Date", () => {
+    let value = %raw(`undefined`)
+
+    expect(Colander.instanceOfDate(value)) |> toBe(false)
+  })
+})
+
+describe("Test valid", () => {
+  open Colander
+
+  test("Try to valid data", () => {
+    let value = %raw(`"value"`)
+    let data = %raw(`{"attribute": "value"}`)
+    let fields = <Obj> <Field name="attribute" validator=Colander.string required=true /> </Obj>
+
+    let result = Colander.valid(data, fields)
+
+    expect(result) |> toEqual(Ok(Js.Dict.fromArray([("attribute", value)])))
+  })
+
+  test("Try to valid data with missing field", () => {
+    let data = %raw(`{}`)
+    let fields = <Obj> <Field name="attribute" validator=Colander.string required=true /> </Obj>
+
+    let result = Colander.valid(data, fields)
+
+    expect(result) |> toEqual(Error([("attribute", Colander.Missing)]))
+  })
+
+  test("Try to valid data with invalid field", () => {
+    let data = %raw(`{"attribute": 42}`)
+    let fields = <Obj> <Field name="attribute" validator=Colander.string required=true /> </Obj>
+
+    let result = Colander.valid(data, fields)
+
+    expect(result) |> toEqual(Error([("attribute", Colander.Invalid)]))
   })
 })
