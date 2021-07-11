@@ -163,6 +163,16 @@ describe("Test Field module", () => {
     expect(result) |> toEqual((name, Ok(value)))
   })
 
+  test("Should return None for no required missing value", () => {
+    let required = false
+    let name = "attribute"
+    let validator = Colander.string
+    let data = %raw(`{}`)
+    let result = Field.createElement(~required, ~name, ~validator, ())(data)
+
+    expect(result) |> toEqual((name, Ok(%raw(`undefined`))))
+  })
+
   test("Try to valid a date attribute", () => {
     let required = true
     let name = "date"

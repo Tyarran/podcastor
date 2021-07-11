@@ -103,8 +103,7 @@ let getEpisodes = episodefilePaths => {
   }, _)
 }
 
-open Colorize
-Js.log(<Colorize color=Yellow> "Loading episode files :" </Colorize>)
+Js.log(<Colorize color=Colorize.Yellow> "Loading episode files :" </Colorize>)
 
 let result = getEpisodePaths(podcast)->Js.Promise.then_(filepaths => {
   Belt.Array.forEach(filepaths, filepath => {
