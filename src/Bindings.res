@@ -1,5 +1,7 @@
 module Node = {
   module Fs = {
+    type stat
+
     module Promise = {
       @module("fs/promises") external readdir: string => Js.Promise.t<array<string>> = "readdir"
 
@@ -8,11 +10,20 @@ module Node = {
 
       @module("fs/promises")
       external readFile: (string, string) => Js.Promise.t<string> = "readFile"
+
+      @module("fs/promises")
+      external stat: string => Js.Promise.t<stat> = "stat"
+    }
+
+    module Stats = {
+      @send
+      external isDirectory: stat => bool = "isDirectory"
     }
   }
   @val external dirname: string = "__dirname"
   module Process = {
     @module("process") @val external cwd: unit => string = "cwd"
+    @module("process") @val external argv: array<string> = "argv"
   }
 }
 
@@ -49,7 +60,7 @@ module Slugger = {
 module JsYaml = {
   type metadata = {
     @as("Title") title: string,
-    date: string,
+    @as("Date") date: string,
     @as("Slug") slug: option<string>,
   }
   external toMetadata: Js.Dict.t<Colander.raw> => metadata = "%identity"
@@ -63,4 +74,30 @@ module Chalk = {
   @module("chalk") external yellow: string => string = "yellow"
   @module("chalk") external green: string => string = "green"
   @get external bold: string => string = "bold"
+}
+
+module Yargs = {
+  type t
+  type command = {
+    alias: string,
+    default: string,
+  }
+  @module external yargs: unit => t = "yargs"
+  @module external yargs1: 'a => t = "yargs"
+  @send external scriptName: (t, string) => t = "scriptName"
+  @send external usage: (t, string) => t = "usage"
+  @send external help: (t, unit) => t = "help"
+  @send external describe: (t, string) => t = "describe"
+  @send external epilogue: (t, string) => t = "epilogue"
+  @send external command: (t, string, string, t => unit, t => unit) => t = "command"
+  @send external defaultCommand: (t, array<string>, string, t => unit, t => unit) => t = "command"
+  @send external positionalCommand: (t, string, string, t => t) => t = "command"
+  @send external version: (t, string) => t = "version"
+  @send external positional: (t, string, Js.Dict.t<string>) => t = "positional"
+  @send external parse: (t, array<string>) => t = "parse"
+
+  @get external argv: t => t = "argv"
+  module Helper = {
+    @module("yargs/helpers") external hideBin: array<string> => array<string> = "hideBin"
+  }
 }

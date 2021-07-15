@@ -1,10 +1,11 @@
 {
   "name": "podcastor",
   "version": "0.0.1",
+  "license": "MIT",
   "scripts": {
     "build": "rescript",
     "clean": "rescript clean -with-deps",
-    "start": "rescript build -w",
+    "watch": "rescript build -w",
     "test": "jest"
   },
   "keywords": [
@@ -12,7 +13,6 @@
     "podcast"
   ],
   "author": "",
-  "license": "MIT",
   "dependencies": {
     "@dck/bs-node": "^0.3.3",
     "@rescript/react": "^0.10.3",
@@ -21,13 +21,15 @@
     "marked": "^2.0.7",
     "node-yaml": "^4.0.1",
     "nunjucks": "^3.2.3",
+    "podcastor": "./",
     "react": "^17.0.2",
     "rescript": "*",
     "slugger": "^1.0.1",
-    "toml": "^3.0.0"
+    "toml": "^3.0.0",
+    "yargs": "^17.0.1"
   },
   "bin": {
-    "podcastor": "node ./src/Demo.bs.js"
+    "podcastor": "./bin/podcastor.js"
   },
   "devDependencies": {
     "@glennsl/bs-jest": "^0.7.0"

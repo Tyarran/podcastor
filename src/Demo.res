@@ -29,19 +29,6 @@ let getEpisodePaths = (podcast: Types.Podcast.t) => {
   }, _)
 }
 
-let hasErrors = episodes => {
-  let errored = Belt.Array.keep(episodes, episode => {
-    switch episode {
-    | Ok(_) => false
-    | Error(_) => true
-    }
-  })
-  switch Belt.Array.length(errored) != 0 {
-  | true => (true, errored)
-  | false => (false, [])
-  }
-}
-
 let sortEpisodesByDate = (a: Types.Episode.t, b: Types.Episode.t) => {
   switch a.date < b.date {
   | true => 1
@@ -105,19 +92,23 @@ let getEpisodes = episodefilePaths => {
 
 Js.log(<Colorize color=Colorize.Yellow> "Loading episode files :" </Colorize>)
 
-let result = getEpisodePaths(podcast)->Js.Promise.then_(filepaths => {
-  Belt.Array.forEach(filepaths, filepath => {
-    let _ = Bindings.Node.Fs.Promise.readFile(filepath, "utf-8")->Js.Promise.then_(content => {
-      let result = Reader.read(content, filepath)
-      let formated = switch result {
-      | Ok(_) => <Colorize color=Colorize.Green> "ok" </Colorize>
-      | Error(error) => Reader.formatError(error)
-      }
-      Js.log(formated)->Js.Promise.resolve
-    }, _)
-  })->Js.Promise.resolve
-}, _)
+type arguments = {destination: string}
+external toArgument: Bindings.Yargs.t => arguments = "%identity"
 
-/* open Test */
+let build = yargs => {
+  Js.log((yargs->toArgument).destination)
+  let result = getEpisodePaths(podcast)->Js.Promise.then_(filepaths => {
+    Belt.Array.forEach(filepaths, filepath => {
+      let _ = Bindings.Node.Fs.Promise.readFile(filepath, "utf-8")->Js.Promise.then_(content => {
+        let result = Reader.read(content, filepath)
+        switch result {
+        | Ok(episode) => Js.log(episode)
+        | Error(error) => Js.log(Reader.formatError(error))
+        }->Js.Promise.resolve
+      }, _)
+    })->Js.Promise.resolve
+  }, _)
+  Js.log(result)
+}
 
-/* \">>="(1, 2) */
+let _ = ContextBuilder.getPodcastsPaths("/home/romain/Projects/podcastor/podcasts/")
