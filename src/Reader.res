@@ -21,7 +21,6 @@ let loadMetadata = yamlContent => {
   try {
     open Colander
     let readed = Bindings.JsYaml.loadMetadata(yamlContent)
-    Js.log(readed)
     let validated = valid(
       readed,
       <Obj>

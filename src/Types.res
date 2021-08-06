@@ -30,3 +30,20 @@ module Context = {
     podcasts: array<Podcast.t>,
   }
 }
+
+module Config = {
+  type podcast = {
+    name: string,
+    description: string,
+    image: string,
+    slug: string,
+    path: string,
+  }
+
+  type t = {
+    name: string,
+    description: string,
+    logo: string,
+    podcasts: array<podcast>,
+  }
+}

@@ -19,7 +19,22 @@ module Node = {
       @send
       external isDirectory: stat => bool = "isDirectory"
     }
+    @module("fs")
+    external readFileSync_: (string, string) => string = "readFileSync"
+
+    let readFileSync = (path, encoding) => {
+      try {
+        Ok(readFileSync_(path, encoding))
+      } catch {
+      | Js.Exn.Error(obj) =>
+        switch Js.Exn.message(obj) {
+        | Some(m) => Error(m)
+        | None => Error("Unkown Error")
+        }
+      }
+    }
   }
+
   @val external dirname: string = "__dirname"
   module Process = {
     @module("process") @val external cwd: unit => string = "cwd"
@@ -99,5 +114,66 @@ module Yargs = {
   @get external argv: t => t = "argv"
   module Helper = {
     @module("yargs/helpers") external hideBin: array<string> => array<string> = "hideBin"
+  }
+}
+
+module Toml = {
+  type t
+  @module("toml") external parse_: string => t = "parse"
+
+  let parse = content => {
+    try {
+      Ok(parse_(content))
+    } catch {
+    | Js.Exn.Error(obj) =>
+      switch Js.Exn.message(obj) {
+      | Some(m) => Error("Caught a JS exception! Message: " ++ m)
+      | None => Error("Unknown error")
+      }
+    }
+  }
+}
+
+module Ajv = {
+  type t
+  type f<'a> = 'a => bool
+
+  type errorType = {additionalProperty: string}
+  type error = {
+    instancePath: string,
+    schemaPath: string,
+    keyword: string,
+    params: errorType,
+    message: string,
+    @return(nullable) propertyName: string,
+  }
+
+  type errors = array<error>
+  @get external errors_: f<'a> => errors = "errors"
+  @send external compile_: (t, 'a) => f<'b> = "compile"
+  @module @new external make: unit => t = "ajv"
+  @module @new external makeWithOptions: 'a => t = "ajv"
+  exception CompilationError(Js.Exn.t)
+
+  let compile = (ajv, schema) => {
+    try {
+      let validator = compile_(ajv, schema)
+      data =>
+        switch validator(data) {
+        | true => Ok(data)
+        | false => Error(validator->errors_)
+        }
+    } catch {
+    | Js.Exn.Error(error) => raise(CompilationError(error))
+    }
+  }
+}
+
+module Console = {
+  external toJson: 'a => Js.Json.t = "%identity"
+
+  let log = value => {
+    let json = toJson(value)
+    json->Js.Json.stringifyWithSpace(2)->Js.log
   }
 }

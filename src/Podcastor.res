@@ -34,7 +34,7 @@ let result =
       )
     },
     yargs => {
-      Demo.build(yargs)
+      Commands.build(yargs)
     },
   )
   ->argv

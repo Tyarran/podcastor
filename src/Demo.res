@@ -90,25 +90,38 @@ let getEpisodes = episodefilePaths => {
   }, _)
 }
 
-Js.log(<Colorize color=Colorize.Yellow> "Loading episode files :" </Colorize>)
+/* Js.log(<Colorize color=Colorize.Yellow> "Loading episode files :" </Colorize>) */
 
-type arguments = {destination: string}
-external toArgument: Bindings.Yargs.t => arguments = "%identity"
+/* type arguments = {destination: string} */
+/* external toArgument: Bindings.Yargs.t => arguments = "%identity" */
 
-let build = yargs => {
-  Js.log((yargs->toArgument).destination)
-  let result = getEpisodePaths(podcast)->Js.Promise.then_(filepaths => {
-    Belt.Array.forEach(filepaths, filepath => {
-      let _ = Bindings.Node.Fs.Promise.readFile(filepath, "utf-8")->Js.Promise.then_(content => {
-        let result = Reader.read(content, filepath)
-        switch result {
-        | Ok(episode) => Js.log(episode)
-        | Error(error) => Js.log(Reader.formatError(error))
-        }->Js.Promise.resolve
-      }, _)
-    })->Js.Promise.resolve
-  }, _)
-  Js.log(result)
-}
+/* let result = getEpisodePaths(podcast)->Js.Promise.then_(filepaths => { */
+/* Belt.Array.forEach(filepaths, filepath => { */
+/* let _ = Bindings.Node.Fs.Promise.readFile(filepath, "utf-8")->Js.Promise.then_(content => { */
+/* let result = Reader.read(content, filepath) */
+/* switch result { */
+/* | Ok(episode) => Js.log(episode) */
+/* | Error(error) => Js.log(Reader.formatError(error)) */
+/* }->Js.Promise.resolve */
+/* }, _) */
+/* })->Js.Promise.resolve */
+/* }, _) */
+/* Js.log(result) */
 
-let _ = ContextBuilder.getPodcastsPaths("/home/romain/Projects/podcastor/podcasts/")
+/* let config = Config.findCOnfigToml() */
+/* %debugger */
+
+/* let build = _ => { */
+/* let config = Config.findConfigToml() */
+/* let _ = switch config { */
+/* | Ok(config) => Js.log(config) */
+/* | Error(errors) => Js.log(errors[0].instancePath) */
+/* /1* | Error(errors) => Js.log(errors[0].propertyName) *1/ */
+/* } */
+/* /1* switch config { *1/ */
+/* /1* | Ok(config) => Js.log(config) *1/ */
+/* /1* | Error(errors) => Js.log(errors) *1/ */
+/* /1* } *1/ */
+/* } */
+
+/* let _ = ContextBuilder.getPodcastsPaths("/home/romain/Projects/podcastor/podcasts/") */
